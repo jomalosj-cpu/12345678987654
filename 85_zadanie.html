@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Электронная библиотека</title><style>*{box-sizing:border-box}body{margin:0;padding:28px 16px;background:#f3f4f6;color:#1f2937;font:16px/1.5 Arial,sans-serif}.card{max-width:720px;margin:0 auto;padding:28px;background:#fff;border:1px solid #d1d5db;border-radius:12px}h1{margin-top:0;font-size:28px}h2{font-size:20px}button{padding:10px 14px;border:1px solid #9ca3af;border-radius:6px;background:#f9fafb;cursor:pointer;margin:5px 5px 5px 0}button:disabled{cursor:not-allowed;opacity:.5}input:not([type=checkbox]){padding:10px;border:1px solid #9ca3af;border-radius:6px;max-width:100%}label{display:block;margin:12px 0}.number{font-size:56px;font-weight:700;margin:20px 0}.signal{background:#262626;padding:12px;border-radius:28px;width:90px;display:grid;gap:10px;margin:12px auto}.light{height:56px;width:56px;border-radius:50%;opacity:.2}.red{background:#e53935}.yellow{background:#fbc02d}.green{background:#43a047}.light.active{opacity:1;box-shadow:0 0 10px currentColor}.controls{text-align:center}.book{padding:14px 0;border-bottom:1px solid #ddd}.book h2{margin-bottom:0}.check{display:flex;gap:8px;align-items:center}li{margin:4px 0}</style></head><body><main class="card"><h1>Электронная библиотека</h1><label for="search">Поиск по названию</label><input id="search" placeholder="Введите название книги"><label class="check"><input type="checkbox" id="availableOnly"> Показывать только доступные</label><p id="count"></p><div id="books"></div></main>
+<script>
+const books = [
+  {title: "JavaScript Basics", author: "Ivanov", available: true},
+  {title: "HTML and CSS", author: "Petrov", available: false},
+  {title: "Python Programming", author: "Sidorov", available: true},
+  {title: "Database Systems", author: "Akhmetov", available: true}
+];
+const list = document.querySelector("#books"), search = document.querySelector("#search"), availableOnly = document.querySelector("#availableOnly");
+function renderBooks() {
+  const query = search.value.trim().toLocaleLowerCase("ru");
+  const filtered = books.filter(book => book.title.toLocaleLowerCase("ru").includes(query) && (!availableOnly.checked || book.available));
+  list.replaceChildren();
+  document.querySelector("#count").textContent = `Найдено книг: ${filtered.length}`;
+  if (!filtered.length) { const p = document.createElement("p"); p.textContent = "Книги не найдены."; list.append(p); return; }
+  filtered.forEach(book => {
+    const article = document.createElement("article"); article.className = "book";
+    const title = document.createElement("h2"); title.textContent = book.title;
+    const author = document.createElement("p"); author.textContent = `Автор: ${book.author}`;
+    const status = document.createElement("p"); status.textContent = book.available ? "Доступна" : "Выдана";
+    const button = document.createElement("button"); button.textContent = book.available ? "Взять книгу" : "Недоступна"; button.disabled = !book.available;
+    button.addEventListener("click", () => { book.available = false; renderBooks(); });
+    article.append(title, author, status, button); list.append(article);
+  });
+}
+search.addEventListener("input", renderBooks); availableOnly.addEventListener("change", renderBooks); renderBooks();
+</script></body></html>
